@@ -6,8 +6,8 @@ SQLAlchemy Sphinx
 .. |travis| image:: https://travis-ci.org/akissa/sqlalchemy-sphinx.svg?branch=py26
     :target: https://travis-ci.org/akissa/sqlalchemy-sphinx
 
-.. |coveralls| image:: https://coveralls.io/repos/github/akissa/sqlalchemy-sphinx/badge.svg?branch=master
-    :target: https://coveralls.io/github/akissa/sqlalchemy-sphinx?branch=master
+.. |coveralls| image:: https://coveralls.io/repos/github/akissa/sqlalchemy-sphinx/badge.svg?branch=py26
+    :target: https://coveralls.io/github/akissa/sqlalchemy-sphinx?branch=py26
 
 SQLAlchemy Sphinx is a dialect for SQLalchemy which converts SQLAlchemy
 model into compatible sql for sphinx.

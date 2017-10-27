@@ -37,11 +37,11 @@ class SphinxCompiler(compiler.SQLCompiler):
         options_list = []
         for clause in fn.clauses.clauses:
             if clause.left.name in ["field_weights", "index_weights"]:
-                option = "{}=({})"
+                option = "{0}=({1})"
                 option = option.format(clause.left.name, ", ".join(clause.right.value))
                 options_list.append(option)
             else:
-                option = "{}={}"
+                option = "{0}={1}"
                 option = option.format(clause.left.name, clause.right.value)
                 options_list.append(option)
         self.options_list = options_list
@@ -50,7 +50,7 @@ class SphinxCompiler(compiler.SQLCompiler):
     def limit_clause(self, select, **kw):
         text = ""
         if select._limit is not None and select._offset is None:
-            text += "\n LIMIT 0, {}".format(select._limit)
+            text += "\n LIMIT 0, {0}".format(select._limit)
         else:
             text += "\n LIMIT %s, %s" % (
                 self.process(sql.literal(select._offset)),
@@ -70,11 +70,11 @@ class SphinxCompiler(compiler.SQLCompiler):
         if self.left_match and self.right_match:
             match_terms = []
             for left, right in zip(self.left_match, self.right_match):
-                t = "(@{} {})".format(self.process(left), right.value)
+                t = "(@{0} {1})".format(self.process(left), right.value)
                 match_terms.append(t)
             self.left_match = tuple()
             self.right_match = tuple()
-            return "MATCH('{}')".format(" ".join(match_terms))
+            return "MATCH('{0}')".format(" ".join(match_terms))
 
     def visit_match_func(self, fn, **kw):
         '''
@@ -83,14 +83,14 @@ class SphinxCompiler(compiler.SQLCompiler):
         if self.left_match and self.right_match:
             match_terms = []
             for left, right in zip(self.left_match, self.right_match):
-                t = "(@{} {})".format(self.process(left), right.value)
+                t = "(@{0} {1})".format(self.process(left), right.value)
                 match_terms.append(t)
             self.left_match = tuple()
             self.right_match = tuple()
-            return "MATCH('{}')".format(" ".join(match_terms))
+            return "MATCH('{0}')".format(" ".join(match_terms))
 
     def visit_distinct_func(self, func, **kw):
-        return "DISTINCT {}".format(self.process(func.clauses.clauses[0]))
+        return "DISTINCT {0}".format(self.process(func.clauses.clauses[0]))
 
     def visit_select(self, select,
                      asfrom=False, parens=True, iswrapper=False,
@@ -197,7 +197,7 @@ class SphinxCompiler(compiler.SQLCompiler):
 
             if hasattr(self, "options_list"):
                 if self.options_list:
-                    option_text = " OPTION {}".format(", ".join(self.options_list))
+                    option_text = " OPTION {0}".format(", ".join(self.options_list))
                     text += option_text
 
         if select._group_by_clause.clauses:

@@ -1,7 +1,7 @@
 SQLAlchemy Sphinx
 =================
 
-|travis| |pypi| |coveralls|
+|travis| |coveralls|
 
 .. |travis| image:: https://travis-ci.org/akissa/sqlalchemy-sphinx.svg?branch=py26
     :target: https://travis-ci.org/akissa/sqlalchemy-sphinx

@@ -3,8 +3,8 @@ SQLAlchemy Sphinx
 
 |travis| |pypi| |coveralls|
 
-.. |travis| image:: https://travis-ci.org/AdrielVelazquez/sqlalchemy-sphinx.svg?branch=master
-    :target: https://travis-ci.org/AdrielVelazquez/sqlalchemy-sphinx
+.. |travis| image:: https://travis-ci.org/akissa/sqlalchemy-sphinx.svg?branch=py26
+    :target: https://travis-ci.org/akissa/sqlalchemy-sphinx
     
 .. |pypi| image:: https://badge.fury.io/py/sqlalchemy-sphinx.svg
     :target: https://badge.fury.io/py/sqlalchemy-sphinx

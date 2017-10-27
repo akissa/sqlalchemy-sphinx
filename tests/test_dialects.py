@@ -158,7 +158,7 @@ def test_result_maps_configurations(sphinx_connections):
     with pytest.raises(AssertionError) as exc:
         query = session.query(func.count(distinct(MockSphinxModel.country)))
         query.statement.compile(sphinx_engine).string
-    if sys.version_info.major >= 3:
+    if sys.version_info[0] >= 3:
         assert exc.value.msg == "Can't query distinct if no group by  is selected"
     else:
         assert exc.value.message == "Can't query distinct if no group by  is selected"

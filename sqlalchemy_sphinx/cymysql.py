@@ -39,6 +39,9 @@ class Dialect(SphinxDialect, cymysql_dialect.MySQLDialect_cymysql):
     def get_isolation_level(self, connection):
         pass
 
+    def escape_value(self, value):
+        return cymysql.escape_string(value)
+
     @classmethod
     def dbapi(cls):
         return DBAPIShim()

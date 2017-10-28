@@ -70,20 +70,9 @@ class SphinxCompiler(compiler.SQLCompiler):
         if self.left_match and self.right_match:
             match_terms = []
             for left, right in zip(self.left_match, self.right_match):
-                t = "(@{0} {1})".format(self.process(left), right.value)
-                match_terms.append(t)
-            self.left_match = tuple()
-            self.right_match = tuple()
-            return "MATCH('{0}')".format(" ".join(match_terms))
-
-    def visit_match_func(self, fn, **kw):
-        '''
-        Overwrite the top level match func since Sphinx does match differently
-        '''
-        if self.left_match and self.right_match:
-            match_terms = []
-            for left, right in zip(self.left_match, self.right_match):
-                t = "(@{0} {1})".format(self.process(left), right.value)
+                t = "(@{0} {1})".format(
+                    self.process(left),
+                    self.dialect.escape_value(right.value))
                 match_terms.append(t)
             self.left_match = tuple()
             self.right_match = tuple()
@@ -163,11 +152,6 @@ class SphinxCompiler(compiler.SQLCompiler):
                 left_tuple.append(clause.left)
                 right_tuple.append(clause.right)
                 match_operators.append(clause.operator)
-            elif isinstance(clause, Function):
-                if clause.name.lower() == "match":
-                    func_left, func_right = clause.clauses
-                    left_tuple.append(func_left)
-                    right_tuple.append(func_right)
             elif isinstance(clause, ClauseList):
                 for xclause in clause.clauses:
                     l, r, m = check_match_clause(xclause)

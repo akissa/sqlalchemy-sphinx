@@ -49,11 +49,47 @@ def test_match(sphinx_connections):
     sql_text = query.statement.compile(sphinx_engine).string
     assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('(@name adriel)')"
 
+    # Escape quote
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match(MockSphinxModel.name, "adri'el"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('(@name adri\\'el)')"
+
+    # Function match all
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match("adriel"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('adriel')"
+
+    # Function match all with quote
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match("adri'el"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('adri\\'el')"
+
+    # Function match specific
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match("@name adriel"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('@name adriel')"
+
+    # Function match specific with quote
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match("@name adri'el"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('@name adri\\'el')"
+
     # Matching single columns
     query = session.query(MockSphinxModel.id)
     query = query.filter(MockSphinxModel.name.match("adriel"), MockSphinxModel.country.match("US"))
     sql_text = query.statement.compile(sphinx_engine).string
     assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('(@name adriel) (@country US)')"
+
+    # Matching single columns with quotes
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(MockSphinxModel.name.match("adri'el"), MockSphinxModel.country.match("US"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('(@name adri\\'el) (@country US)')"
 
     # Matching through functions
     query = session.query(MockSphinxModel.id)

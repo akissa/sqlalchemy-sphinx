@@ -9,15 +9,18 @@ def test_cymysql_connection():
     sphinx_engine = create_engine("sphinx+cymsql://")
     assert isinstance(sphinx_engine.dialect, SphinxDialect)
     assert isinstance(sphinx_engine.dialect, Dialect)
+    assert sphinx_engine.dialect.escape_value("adri'el") == "'adri\\'el'"
 
 
 def test_mysqldb_connection():
     sphinx_engine = create_engine("sphinx://")
     assert isinstance(sphinx_engine.dialect, SphinxDialect)
     assert isinstance(sphinx_engine.dialect, myDialect)
+    assert sphinx_engine.dialect.escape_value("adri'el") == "adri\\'el"
     sphinx_engine = create_engine("sphinx+mysqldb://")
     assert isinstance(sphinx_engine.dialect, SphinxDialect)
     assert isinstance(sphinx_engine.dialect, myDialect)
+    assert sphinx_engine.dialect.escape_value("adri'el") == "adri\\'el"
 
 
 def test_sanity_on_detects():

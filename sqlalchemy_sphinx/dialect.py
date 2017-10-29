@@ -14,6 +14,9 @@ __all__ = ("SphinxDialect")
 
 class SphinxCompiler(compiler.SQLCompiler):
 
+    def visit_count_func(self, fn, *args, **_kw):
+        return 'COUNT(*)'
+
     def visit_options_func(self, fn, *args, **_kw):
         """
         OPTION clause. This is a Sphinx specific extension that lets you control a number of per-query options.

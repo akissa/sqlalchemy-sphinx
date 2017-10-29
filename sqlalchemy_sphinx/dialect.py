@@ -192,12 +192,6 @@ class SphinxCompiler(compiler.SQLCompiler):
             if t:
                 text += " \nWHERE " + t
 
-            if hasattr(self, "options_list"):
-                if self.options_list:
-                    option_text = " OPTION {0}".format(
-                        ", ".join(self.options_list))
-                    text += option_text
-
         if select._group_by_clause.clauses:
             group_by = select._group_by_clause._compiler_dispatch(
                 self, **kwargs)
@@ -207,6 +201,12 @@ class SphinxCompiler(compiler.SQLCompiler):
             text += self.order_by_clause(select, **kwargs)
         if select._limit is not None:
             text += self.limit_clause(select)
+
+        if hasattr(self, "options_list"):
+            if self.options_list:
+                option_text = " OPTION {0}".format(
+                    ", ".join(self.options_list))
+                text += option_text
 
         self.stack.pop(-1)
         return text

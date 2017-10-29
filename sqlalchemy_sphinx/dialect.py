@@ -15,23 +15,28 @@ __all__ = ("SphinxDialect")
 class SphinxCompiler(compiler.SQLCompiler):
 
     def visit_count_func(self, fn, *args, **_kw):
+        "sphinxQL does not support other forms of count"
         return 'COUNT(*)'
 
     def visit_options_func(self, fn, *args, **_kw):
         """
-        OPTION clause. This is a Sphinx specific extension that lets you control a number of per-query options.
+        OPTION clause. This is a Sphinx specific extension that lets you
+        control a number of per-query options.
 
         The syntax is:
         OPTION <optionname>=<value> [ , ... ]
         Supported options and respectively allowed values are:
-        'ranker' - any of 'proximity_bm25', 'bm25', 'none', 'wordcount', 'proximity', 'matchany', or 'fieldmask'
+        'ranker' - any of 'proximity_bm25', 'bm25', 'none', 'wordcount',
+            'proximity', 'matchany', or 'fieldmask'
         'max_matches' - integer (per-query max matches value)
         'cutoff' - integer (max found matches threshold)
         'max_query_time' - integer (max search time threshold, msec)
         'retry_count' - integer (distributed retries count)
         'retry_delay' - integer (distributed retry delay, msec)
-        'field_weights' - a named integer list (per-field user weights for ranking)
-        'index_weights' - a named integer list (per-index user weights for ranking)
+        'field_weights' - a named integer list
+            (per-field user weights for ranking)
+        'index_weights' - a named integer list
+            (per-index user weights for ranking)
 
         Example:
         SELECT * FROM test WHERE MATCH('@title hello @body world')
@@ -41,7 +46,8 @@ class SphinxCompiler(compiler.SQLCompiler):
         for clause in fn.clauses.clauses:
             if clause.left.name in ["field_weights", "index_weights"]:
                 option = "{0}=({1})"
-                option = option.format(clause.left.name, ", ".join(clause.right.value))
+                option = option.format(
+                    clause.left.name, ", ".join(clause.right.value))
                 options_list.append(option)
             else:
                 option = "{0}={1}"
@@ -60,7 +66,8 @@ class SphinxCompiler(compiler.SQLCompiler):
                 self.process(sql.literal(select._limit)))
         return text
 
-    def visit_column(self, column, result_map=None, include_table=True, **kwargs):
+    def visit_column(
+            self, column, result_map=None, include_table=True, **kwargs):
         name = column.name
         is_literal = column.is_literal
         if is_literal:
@@ -99,9 +106,6 @@ class SphinxCompiler(compiler.SQLCompiler):
             self.right_match = tuple()
             return "MATCH('{0}')".format(" ".join(match_terms))
 
-    def visit_distinct_func(self, func, **kw):
-        return "DISTINCT {0}".format(self.process(func.clauses.clauses[0]))
-
     def visit_select(self, select,
                      asfrom=False, parens=True, iswrapper=False,
                      fromhints=None, compound_index=1, force_result_map=False,
@@ -125,30 +129,9 @@ class SphinxCompiler(compiler.SQLCompiler):
         # the actual list of columns to print in the SELECT column list.
 
         unique_co = []
-        distinct_alias = None
         for co in util.unique_list(select.inner_columns):
             sql_util = self._label_select_column(select, co, True, asfrom, {})
-            if "DISTINCT" in sql_util:
-                distinct_alias = sql_util.split(" AS ")[-1]
             unique_co.append(sql_util)
-        result_columns = []
-        if distinct_alias:
-            for idx, rc_tuple in enumerate(self._result_columns):
-                if rc_tuple[0] == distinct_alias:
-                    if rc_tuple[-2][-1] == distinct_alias:
-                        target_name = "@distinct"
-                        temp_rc = list(rc_tuple)
-                        temp_rc[0] = target_name
-                        inner_tuple = list(temp_rc[-2])
-                        inner_tuple[-1] = target_name
-                        if not select._group_by_clause.clauses:
-                            raise AssertionError("Can't query distinct if no group by  is selected")
-                        temp_rc[-2] = tuple(inner_tuple)
-                        result_columns.append(tuple(temp_rc))
-                else:
-                    result_columns.append(rc_tuple)
-        if result_columns:
-            self._result_columns = result_columns
 
         inner_columns = [
             c for c in unique_co
@@ -211,7 +194,8 @@ class SphinxCompiler(compiler.SQLCompiler):
 
             if hasattr(self, "options_list"):
                 if self.options_list:
-                    option_text = " OPTION {0}".format(", ".join(self.options_list))
+                    option_text = " OPTION {0}".format(
+                        ", ".join(self.options_list))
                     text += option_text
 
         if select._group_by_clause.clauses:

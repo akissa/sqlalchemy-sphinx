@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 from sqlalchemy import create_engine, Column, Integer, String, func, distinct
@@ -170,31 +168,16 @@ def test_select_sanity(sphinx_connections):
 
 def test_distinct_and_count(sphinx_connections):
     MockSphinxModel, session, sphinx_engine = sphinx_connections
-    query = session.query(distinct(MockSphinxModel.name)).group_by(MockSphinxModel.group_by_dummy)
+    query = session.query(func.count()).select_from(MockSphinxModel)
     sql_text = query.statement.compile(sphinx_engine).string
-    assert sql_text == 'SELECT DISTINCT name AS anon_1 \nFROM mock_table GROUP BY group_by_dummy'
-    query = session.query(func.count(distinct(MockSphinxModel.id))).group_by(MockSphinxModel.group_by_dummy)
-    sql_text = query.statement.compile(sphinx_engine).string
-    assert sql_text == 'SELECT count(DISTINCT id) AS count_1 \nFROM mock_table GROUP BY group_by_dummy'
-    query = session.query(func.distinct(MockSphinxModel.name)).group_by(MockSphinxModel.group_by_dummy)
-    sql_text = query.statement.compile(sphinx_engine).string
-    assert sql_text == 'SELECT DISTINCT name AS distinct_1 \nFROM mock_table GROUP BY group_by_dummy'
-    query = session.query(func.count(distinct(MockSphinxModel.id)), MockSphinxModel.id)
-    query = query.group_by(MockSphinxModel.group_by_dummy)
-    sql_text = query.statement.compile(sphinx_engine).string
-    assert sql_text == 'SELECT count(DISTINCT id) AS count_1, id \nFROM mock_table GROUP BY group_by_dummy'
-    query = session.query(func.count(distinct(MockSphinxModel.id)), MockSphinxModel.id, func.sum(MockSphinxModel.id))
-    query = query.group_by(MockSphinxModel.group_by_dummy)
-    st = query.statement.compile(sphinx_engine).string
-    assert st == 'SELECT count(DISTINCT id) AS count_1, id, sum(id) AS sum_1 \nFROM mock_table GROUP BY group_by_dummy'
+    assert sql_text == 'SELECT COUNT(*) AS count_1 \nFROM mock_table'
 
-
-def test_result_maps_configurations(sphinx_connections):
     MockSphinxModel, session, sphinx_engine = sphinx_connections
-    with pytest.raises(AssertionError) as exc:
-        query = session.query(func.count(distinct(MockSphinxModel.country)))
-        query.statement.compile(sphinx_engine).string
-    if sys.version_info[0] >= 3:
-        assert exc.value.msg == "Can't query distinct if no group by  is selected"
-    else:
-        assert exc.value.message == "Can't query distinct if no group by  is selected"
+    query = session.query(func.count('*')).select_from(MockSphinxModel)
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == 'SELECT COUNT(*) AS count_1 \nFROM mock_table'
+
+    MockSphinxModel, session, sphinx_engine = sphinx_connections
+    query = session.query(func.count('*')).select_from(MockSphinxModel).filter(func.match("adriel"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == "SELECT COUNT(*) AS count_1 \nFROM mock_table \nWHERE MATCH('adriel')"

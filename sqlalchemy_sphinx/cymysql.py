@@ -22,7 +22,8 @@ class DBAPIShim(object):
 class Dialect(SphinxDialect, cymysql_dialect.MySQLDialect_cymysql):
 
     def _get_default_schema_name(self, connection):
-        pass
+        """Prevent 'SELECT DATABASE()' being executed"""
+        return None
 
     def _detect_charset(self, connection):
         pass

@@ -221,6 +221,10 @@ class SphinxDialect(default.DefaultDialect):
     # 'SELECT 'X' as some_label;' as it is not supported by Sphinx
     description_encoding = None
 
+    def _get_default_schema_name(self, connection):
+        """Prevent 'SELECT DATABASE()' being executed"""
+        return None
+
     def _check_unicode_returns(self, connection):
         return True
 

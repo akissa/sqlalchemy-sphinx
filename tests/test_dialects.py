@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 
 from sqlalchemy import create_engine, Column, Integer, String, func, distinct
@@ -65,6 +66,12 @@ def test_match(sphinx_connections):
     sql_text = query.statement.compile(sphinx_engine).string
     assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('adri\\'el')"
 
+    # Function match all with unicode
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match(u"miljøet"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == u"SELECT id \nFROM mock_table \nWHERE MATCH('miljøet')"
+
     # Function match specific
     query = session.query(MockSphinxModel.id)
     query = query.filter(func.match("@name adriel"))
@@ -76,6 +83,12 @@ def test_match(sphinx_connections):
     query = query.filter(func.match("@name adri'el"))
     sql_text = query.statement.compile(sphinx_engine).string
     assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('@name adri\\'el')"
+
+    # Function match specific with unicode
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match(u"@name miljøet"))
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == u"SELECT id \nFROM mock_table \nWHERE MATCH('@name miljøet')"
 
     # Matching single columns
     query = session.query(MockSphinxModel.id)
@@ -107,6 +120,13 @@ def test_match(sphinx_connections):
         MockSphinxModel.id == 1)
     sql_text = query.statement.compile(sphinx_engine).string
     assert sql_text == "SELECT id \nFROM mock_table \nWHERE MATCH('(@name adriel) (@country US)') AND id = %s"
+
+    # Match with normal filter with unicode
+    query = session.query(MockSphinxModel.id)
+    query = query.filter(func.match(MockSphinxModel.name, u"miljøet"), MockSphinxModel.country.match("US"),
+        MockSphinxModel.id == 1)
+    sql_text = query.statement.compile(sphinx_engine).string
+    assert sql_text == u"SELECT id \nFROM mock_table \nWHERE MATCH('(@name miljøet) (@country US)') AND id = %s"
 
     query = session.query(MockSphinxModel.id)
     query = query.filter(func.random(MockSphinxModel.name))

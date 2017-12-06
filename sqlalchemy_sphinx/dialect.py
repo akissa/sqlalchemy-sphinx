@@ -80,13 +80,13 @@ class SphinxCompiler(compiler.SQLCompiler):
         if self.left_match and self.right_match:
             match_terms = []
             for left, right in zip(self.left_match, self.right_match):
-                t = "(@{0} {1})".format(
+                t = u"(@{0} {1})".format(
                     self.process(left),
                     self.dialect.escape_value(right.value))
                 match_terms.append(t)
             self.left_match = tuple()
             self.right_match = tuple()
-            return "MATCH('{0}')".format(" ".join(match_terms))
+            return u"MATCH('{0}')".format(u" ".join(match_terms))
 
     def visit_match_func(self, fn, **kw):
         '''
@@ -96,15 +96,15 @@ class SphinxCompiler(compiler.SQLCompiler):
             match_terms = []
             for left, right in zip(self.left_match, self.right_match):
                 if left is None:
-                    t = "{0}".format(self.dialect.escape_value(right.value))
+                    t = u"{0}".format(self.dialect.escape_value(right.value))
                 else:
-                    t = "(@{0} {1})".format(
+                    t = u"(@{0} {1})".format(
                         self.process(left),
                         self.dialect.escape_value(right.value))
                 match_terms.append(t)
             self.left_match = tuple()
             self.right_match = tuple()
-            return "MATCH('{0}')".format(" ".join(match_terms))
+            return u"MATCH('{0}')".format(u" ".join(match_terms))
 
     def visit_select(self, select,
                      asfrom=False, parens=True, iswrapper=False,

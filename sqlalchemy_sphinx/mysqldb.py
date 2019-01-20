@@ -20,6 +20,10 @@ class DBAPIShim(object):
 
 class Dialect(SphinxDialect, mysqldb_dialect.MySQLDialect_mysqldb):
 
+    def _get_server_version_info(self, connection):
+        """Prevent 'SELECT VERSION()' being executed"""
+        return ()
+
     def _get_default_schema_name(self, connection):
         """Prevent 'SELECT DATABASE()' being executed"""
         return None
